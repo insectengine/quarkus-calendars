@@ -1,0 +1,8 @@
+type: call
+title: Quarkus Insights Episode 227 - Going serverless with Quarkus, GraalVM native images and AWS Lambda
+description: |
+    Bert Jan Schrijver details migrating the NLJUG conference app backend from Java Spring on Linux VMs to a serverless Quarkus architecture with GraalVM native images, AWS Lambda, API Gateway, and DynamoDB, covering development, deployment, and cost.
+date: 2025-11-24
+time: 14:00:00
+duration: PT60M
+callLink: https://quarkus.io/insights/

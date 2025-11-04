@@ -1,0 +1,8 @@
+type: call
+title: Quarkus Insights Episode 226 - Supercharged Qute Debugging
+description: |
+    Angelo Zerr shows us how to debug Qute templates using breakpoints in your favorite IDE or editor that supports the Debug Adapter Protocol (DAP).
+date: 2025-11-17
+time: 14:00:00
+duration: PT60M
+callLink: https://quarkus.io/insights/

@@ -1,0 +1,10 @@
+type: call
+title: Quarkus Insights Episode 228 - Breaking Down AI Silos With A2A
+description: |
+    Join us to learn how A2A is revolutionizing multi-agent collaboration by enabling seamless communication between agents regardless of their underlying tech stacks. We’ll show how you can already create A2A agents with Quarkus using the A2A Java SDK and we'll take a look at some interesting examples!
+
+    Special Guests: Farah Juma, Kabir Khan, & Stefano Maestri
+date: 2025-12-01
+time: 14:00:00
+duration: PT60M
+callLink: https://quarkus.io/insights/

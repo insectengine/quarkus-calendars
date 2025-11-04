@@ -1,0 +1,10 @@
+type: call
+title: Quarkus Insights Episode 230 - Hypercharging Java with Leyden
+description: |
+    Heard about Leyden? This revolutionary OpenJDK project is all about accelerating warmup time and boosting peak performance. But did you know you can already start using it, especially with your Quarkus apps? Join us as we explore what Leyden is, the current state of ahead-of-time caching, and see some cool Quarkus examples!
+
+    Special Guests: Ashutosh Mehra, Andrew Dinn & Maria Arias de Reyna Dominguez
+date: 2025-12-15
+time: 14:00:00
+duration: PT60M
+callLink: https://quarkus.io/insights/
