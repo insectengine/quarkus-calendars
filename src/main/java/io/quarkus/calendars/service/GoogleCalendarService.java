@@ -141,6 +141,7 @@ public class GoogleCalendarService {
 
         service.events()
                 .insert(calendarId, event)
+                .setConferenceDataVersion(1)
                 .execute();
     }
 
@@ -158,6 +159,7 @@ public class GoogleCalendarService {
 
         service.events()
                 .update(calendarId, eventId, event)
+                .setConferenceDataVersion(1)
                 .execute();
     }
 

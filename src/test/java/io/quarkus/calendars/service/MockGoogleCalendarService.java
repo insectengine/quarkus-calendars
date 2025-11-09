@@ -98,6 +98,7 @@ public class MockGoogleCalendarService extends GoogleCalendarService {
                 if (events.get(i).getId().equals(eventId)) {
                     event.setId(eventId);
                     events.set(i, event);
+                    return;
                 }
             }
         }
@@ -114,5 +115,30 @@ public class MockGoogleCalendarService extends GoogleCalendarService {
 
     public int getEventCount(String calendarId) {
         return calendarEvents.getOrDefault(calendarId, List.of()).size();
+    }
+
+    public Event getEventById(String calendarId, String eventId) {
+        List<Event> events = calendarEvents.get(calendarId);
+        if (events != null) {
+            return events.stream()
+                    .filter(e -> e.getId().equals(eventId))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
+    }
+
+    public List<Event> getEventsByTitle(String calendarId, String title) {
+        List<Event> events = calendarEvents.get(calendarId);
+        if (events != null) {
+            return events.stream()
+                    .filter(e -> title.equals(e.getSummary()))
+                    .toList();
+        }
+        return List.of();
+    }
+
+    public List<Event> getAllEvents(String calendarId) {
+        return new ArrayList<>(calendarEvents.getOrDefault(calendarId, List.of()));
     }
 }

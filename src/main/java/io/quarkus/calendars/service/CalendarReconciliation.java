@@ -1,5 +1,10 @@
 package io.quarkus.calendars.service;
 
+import com.google.api.services.calendar.model.ConferenceData;
+import com.google.api.services.calendar.model.ConferenceSolution;
+import com.google.api.services.calendar.model.ConferenceSolutionKey;
+import com.google.api.services.calendar.model.CreateConferenceRequest;
+import com.google.api.services.calendar.model.EntryPoint;
 import com.google.api.services.calendar.model.EventDateTime;
 import io.quarkus.calendars.config.GoogleCalendarConfig;
 import io.quarkus.calendars.config.ReconciliationConfig;
@@ -149,8 +154,9 @@ public class CalendarReconciliation {
      * Reconcile local and remote events.
      * Phase 1: Analysis - determine what actions need to be performed
      * Phase 2: Execution - execute the actions
+     * Package-private for testing.
      */
-    private <T extends Event> List<ReconciliationAction> reconcile(
+    <T extends Event> List<ReconciliationAction> reconcile(
             List<T> localEvents,
             List<com.google.api.services.calendar.model.Event> remoteEvents,
             String calendarId) {
@@ -161,8 +167,9 @@ public class CalendarReconciliation {
      * Reconcile local and remote events with optional dry-run mode.
      * Phase 1: Analysis - determine what actions need to be performed
      * Phase 2: Execution - execute the actions (skipped in dry-run mode)
+     * Package-private for testing.
      */
-    private <T extends Event> List<ReconciliationAction> reconcile(
+    <T extends Event> List<ReconciliationAction> reconcile(
             List<T> localEvents,
             List<com.google.api.services.calendar.model.Event> remoteEvents,
             String calendarId,
@@ -335,6 +342,67 @@ public class CalendarReconciliation {
     }
 
     /**
+     * Check if a URL is from a supported video conferencing platform.
+     * Supported platforms: Google Meet, Zoom, Microsoft Teams
+     */
+    private boolean isSupportedVideoPlatform(String url) {
+        if (url == null || url.isBlank()) {
+            return false;
+        }
+
+        String lowerUrl = url.toLowerCase();
+        return lowerUrl.contains("meet.google.com") ||
+               lowerUrl.contains("zoom.us") ||
+               lowerUrl.contains("teams.microsoft.com") ||
+               lowerUrl.contains("teams.live.com");
+    }
+
+    /**
+     * Create conference data for a call link.
+     * This makes the link appear as a video call button in Google Calendar.
+     */
+    private ConferenceData createConferenceData(String callLink) {
+        // Determine platform and set labels
+        String label;
+        String solutionName;
+
+        if (callLink.contains("meet.google.com")) {
+            label = "Join with Google Meet";
+            solutionName = "Google Meet";
+        } else if (callLink.contains("zoom.us")) {
+            label = "Join Zoom Meeting";
+            solutionName = "Zoom";
+        } else if (callLink.contains("teams.microsoft.com") || callLink.contains("teams.live.com")) {
+            label = "Join Microsoft Teams Meeting";
+            solutionName = "Microsoft Teams";
+        } else {
+            label = "Join video call";
+            solutionName = "Video Conference";
+        }
+
+        // Create entry point
+        EntryPoint entryPoint = new EntryPoint();
+        entryPoint.setEntryPointType("video");
+        entryPoint.setUri(callLink);
+        entryPoint.setLabel(label);
+
+        // Create conference solution (required for third-party links)
+        ConferenceSolutionKey solutionKey = new ConferenceSolutionKey();
+        solutionKey.setType("addOn");  // "addOn" is used for third-party conference providers
+
+        ConferenceSolution solution = new ConferenceSolution();
+        solution.setKey(solutionKey);
+        solution.setName(solutionName);
+
+        // Create conference data
+        ConferenceData conferenceData = new ConferenceData();
+        conferenceData.setEntryPoints(List.of(entryPoint));
+        conferenceData.setConferenceSolution(solution);
+
+        return conferenceData;
+    }
+
+    /**
      * Convert local Event to Google Calendar Event.
      */
     private com.google.api.services.calendar.model.Event convertToGoogleEvent(Event localEvent) {
@@ -387,14 +455,21 @@ public class CalendarReconciliation {
             end.setTimeZone("UTC");
             googleEvent.setEnd(end);
 
-            // Add call link to description or location
+            // Add call link to description and conferenceData
             if (callEvent.getCallLink() != null) {
+                // Always add to description
                 String description = googleEvent.getDescription();
                 if (description == null) {
                     description = "";
                 }
                 description += "\n\nJoin: " + callEvent.getCallLink();
                 googleEvent.setDescription(description);
+
+                // Add conferenceData for supported platforms (Google Meet, Zoom, Teams)
+                if (isSupportedVideoPlatform(callEvent.getCallLink())) {
+                    ConferenceData conferenceData = createConferenceData(callEvent.getCallLink());
+                    googleEvent.setConferenceData(conferenceData);
+                }
             }
         }
 

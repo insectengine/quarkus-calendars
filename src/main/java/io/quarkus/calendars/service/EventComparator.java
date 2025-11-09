@@ -118,6 +118,15 @@ public class EventComparator {
             return event.getHangoutLink();
         }
 
+        // Check conferenceData for video entry points (primary source for third-party links)
+        if (event.getConferenceData() != null && event.getConferenceData().getEntryPoints() != null) {
+            for (var entryPoint : event.getConferenceData().getEntryPoints()) {
+                if ("video".equals(entryPoint.getEntryPointType()) && entryPoint.getUri() != null) {
+                    return entryPoint.getUri();
+                }
+            }
+        }
+
         // Check if the link is in the description or location
         String description = event.getDescription();
         if (description != null && (description.contains("http://") || description.contains("https://"))) {
