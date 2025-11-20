@@ -220,16 +220,16 @@ class CallEventTest {
         String yaml = yamlMapper.writeValueAsString(event);
 
         assertThat(yaml)
-                .contains("!<call>")
-                .contains("title: \"Quarkus Community Call\"")
-                .contains("description: \"Monthly community sync\"")
+                .contains("type: call")
+                .contains("title: Quarkus Community Call")
+                .contains("description: Monthly community sync")
                 .contains("date:")
                 .contains("2025")
                 .doesNotContain("allDay")
                 .contains("time:")
                 .contains("14")
                 .contains("duration:")
-                .contains("callLink: \"https://meet.google.com/abc-defg-hij\"");
+                .contains("callLink: https://meet.google.com/abc-defg-hij");
     }
 
     @Test

@@ -127,8 +127,8 @@ class ReleaseEventTest {
         String yaml = yamlMapper.writeValueAsString(event);
 
         assertThat(yaml)
-                .contains("!<release>")
-                .contains("title: \"Quarkus 3.17.0\"")
+                .contains("type: release")
+                .contains("title: Quarkus 3.17.0")
                 .contains("date:")
                 .contains("2025")
                 .contains("10")

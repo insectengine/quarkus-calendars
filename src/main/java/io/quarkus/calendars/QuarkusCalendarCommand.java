@@ -2,6 +2,7 @@ package io.quarkus.calendars;
 
 import io.quarkus.calendars.command.CheckFormatCommand;
 import io.quarkus.calendars.command.ReconcileCommand;
+import io.quarkus.calendars.command.ReleaseSyncCommand;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import picocli.CommandLine;
 
@@ -13,7 +14,8 @@ import picocli.CommandLine;
     description = "Quarkus Calendar Manager - Manage calendar events through YAML files",
     subcommands = {
         CheckFormatCommand.class,
-        ReconcileCommand.class
+        ReconcileCommand.class,
+        ReleaseSyncCommand.class
     }
 )
 public class QuarkusCalendarCommand {
