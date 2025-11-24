@@ -2,7 +2,7 @@ type: call
 title: Quarkus Insights Episode 232 - AI-Powered Form Wizards; Chat, Click, Done
 description: |
     Loïc Magnette joins us to discusses building an AI-powered form-filling assistant using LangChain4j, Quarkus, and Java libraries. He'll cover some of the challenges, the role of RAG, and some practical techniques to create intelligent, user-friendly forms that reduce errors and frustration.
-date: 2025-01-19
+date: 2026-01-19
 time: 14:00:00
 duration: PT60M
 callLink: https://quarkus.io/insights/
