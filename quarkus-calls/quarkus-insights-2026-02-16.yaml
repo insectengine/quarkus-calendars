@@ -1,0 +1,8 @@
+type: call
+title: Quarkus Insights Episode 236 - How do you know if you got better (or worse)?
+description: |
+    Eric Deandrea & Oleg Šelajev discuss testing AI-infused applications, especially those using advanced non-deterministic features like RAG, tools, and agents, presents a significant challenge that requires exploring new, cost-effective tools, technologies, and practices to assess whether application changes lead to improvements or regressions within the rapidly evolving AI landscape.
+date: 2026-02-16
+time: 14:00:00
+duration: PT60M
+callLink: https://quarkus.io/insights/
