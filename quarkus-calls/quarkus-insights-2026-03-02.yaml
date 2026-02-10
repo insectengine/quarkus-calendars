@@ -1,0 +1,8 @@
+type: call
+title: Quarkus Insights Episode 238 - Quarkus and Leyden, the bumpy road ahead
+description: |
+    Guillaume Smet & Georgios Andrianakis join us to discuss the expectations and realities of the implementation of AOT class loading from Leyden with Quarkus.
+date: 2026-03-02
+time: 14:00:00
+duration: PT60M
+callLink: https://quarkus.io/insights/

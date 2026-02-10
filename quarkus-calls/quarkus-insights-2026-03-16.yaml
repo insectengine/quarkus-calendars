@@ -1,0 +1,8 @@
+type: call
+title: Quarkus Insights Episode 239 - Reactive Loom
+description: |
+    Francesco Nigro joins us to show how a custom Loom scheduler built on top of Netty brings together the performance of event-driven I/O and the simplicity of virtual-thread-friendly blocking APIs.
+date: 2026-03-16
+time: 14:00:00
+duration: PT60M
+callLink: https://quarkus.io/insights/
