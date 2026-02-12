@@ -30,7 +30,7 @@ public class ReconcileCommand implements Callable<Integer> {
     public Integer call() {
         try {
             if (dryRun) {
-                System.out.println("=== DRY RUN MODE - No changes will be made ===\n");
+                Log.info("=== DRY RUN MODE - No changes will be made ===");
             }
 
             List<ReconciliationAction> actions = reconciliation.reconcile(dryRun);

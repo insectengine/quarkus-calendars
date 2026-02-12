@@ -26,3 +26,7 @@ reconciliation:
   months-before: 4
   # Number of months after today to include in reconciliation (default: 4)
   months-after: 4
+
+# The LTS releases
+lts:
+  versions: 3.20, 3.27, 3.33

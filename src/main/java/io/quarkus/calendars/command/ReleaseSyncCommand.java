@@ -7,6 +7,7 @@ import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import io.quarkus.calendars.model.ReleaseEvent;
+import io.quarkus.calendars.service.Lts;
 import io.quarkus.logging.Log;
 import jakarta.inject.Inject;
 import picocli.CommandLine;
@@ -42,6 +43,10 @@ public class ReleaseSyncCommand implements Callable<Integer> {
 
     @Inject
     YAMLMapper yamlMapper;
+
+    @Inject
+    Lts lts;
+
 
     @Override
     public Integer call() {
@@ -211,7 +216,11 @@ public class ReleaseSyncCommand implements Callable<Integer> {
         if (version.toUpperCase().contains("CR")) {
             return "Quarkus Platform " + version + " Pre-Release";
         } else {
-            return "Quarkus Platform " + version + " Release";
+            if (lts.isLts(version)) {
+                return "Quarkus Platform " + version + " Release (LTS)";
+            } else {
+                return "Quarkus Platform " + version + " Release";
+            }
         }
     }
 
