@@ -1,7 +1,7 @@
 type: call
-title: Quarkus Insights Episode 237 - What is Database Cloud? 
+title: Quarkus Insights Episode 237 - What is StackGres? 
 description: |
-    Álvaro Hernández joins us to discuss Database Cloud, a Kubernetes orchestrator with Quarkus.
+    Álvaro Hernández & Matteo Melli join us to discuss StackGres, a Kubernetes orchestrator with Quarkus.
 date: 2026-02-23
 time: 14:00:00
 duration: PT60M
