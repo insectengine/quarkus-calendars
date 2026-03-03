@@ -12,9 +12,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 @CommandLine.Command(
@@ -81,6 +84,14 @@ public class CheckFormatCommand implements Callable<Integer> {
                     // Validate the event
                     event.validate();
 
+                    // Check if filename date matches YAML content date
+                    LocalDate fileNameDate = extractDateFromFileName(yamlFile.getFileName().toString());
+                    if (fileNameDate != null && !fileNameDate.equals(event.getDate())) {
+                        violations.add(fileName + ": Date in filename (" + fileNameDate +
+                                     ") does not match date in YAML content (" + event.getDate() + ")");
+                        continue;
+                    }
+
                     Log.info("  ✓ " + fileName);
 
                 } catch (IOException e) {
@@ -96,5 +107,26 @@ public class CheckFormatCommand implements Callable<Integer> {
         }
 
         return violations;
+    }
+
+    /**
+     * Extracts a date in YYYY-MM-DD format from a filename.
+     * @param fileName the filename to parse
+     * @return the extracted LocalDate, or null if no date pattern found
+     */
+    private LocalDate extractDateFromFileName(String fileName) {
+        // Look for YYYY-MM-DD pattern in filename
+        Pattern pattern = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
+        Matcher matcher = pattern.matcher(fileName);
+
+        if (matcher.find()) {
+            try {
+                return LocalDate.parse(matcher.group(1));
+            } catch (Exception e) {
+                // If parsing fails, return null
+                return null;
+            }
+        }
+        return null;
     }
 }
