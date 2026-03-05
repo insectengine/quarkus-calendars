@@ -204,9 +204,22 @@ public class CalendarReconciliation {
         List<ReconciliationAction> actions = new ArrayList<>();
 
         // Build a map of remote events by title+date for quick lookup
+        // Also detect duplicates (multiple events with same title+date)
         Map<String, com.google.api.services.calendar.model.Event> remoteEventMap = new HashMap<>();
+        Map<String, List<com.google.api.services.calendar.model.Event>> duplicatesMap = new HashMap<>();
+
         for (com.google.api.services.calendar.model.Event remoteEvent : remoteEvents) {
             String key = getEventKey(remoteEvent);
+
+            if (remoteEventMap.containsKey(key)) {
+                // Duplicate found - track it
+                duplicatesMap.computeIfAbsent(key, k -> new ArrayList<>());
+                if (!duplicatesMap.get(key).contains(remoteEventMap.get(key))) {
+                    duplicatesMap.get(key).add(remoteEventMap.get(key));
+                }
+                duplicatesMap.get(key).add(remoteEvent);
+            }
+
             remoteEventMap.put(key, remoteEvent);
         }
 
@@ -243,6 +256,28 @@ public class CalendarReconciliation {
                 } else {
                     // Warn about external events (created manually or by another tool)
                     actions.add(ReconciliationAction.warnOrphan(remoteEvent, calendarId));
+                }
+            }
+        }
+
+        // Handle duplicates - delete all but one event for each duplicate key
+        for (Map.Entry<String, List<com.google.api.services.calendar.model.Event>> entry : duplicatesMap.entrySet()) {
+            String key = entry.getKey();
+            List<com.google.api.services.calendar.model.Event> duplicates = entry.getValue();
+
+            Log.warnf("Found %d duplicate events for key '%s': deleting %d extra copies",
+                    duplicates.size(), key, duplicates.size() - 1);
+
+            // Keep the first one (already in remoteEventMap), delete the rest
+            for (int i = 0; i < duplicates.size() - 1; i++) {
+                com.google.api.services.calendar.model.Event duplicate = duplicates.get(i);
+                if (isManagedByUs(duplicate)) {
+                    actions.add(ReconciliationAction.delete(duplicate, calendarId));
+                    Log.infof("  - Deleting duplicate event: %s (ID: %s)",
+                            duplicate.getSummary(), duplicate.getId());
+                } else {
+                    Log.warnf("  - Duplicate event not managed by us, skipping: %s (ID: %s)",
+                            duplicate.getSummary(), duplicate.getId());
                 }
             }
         }
