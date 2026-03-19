@@ -139,7 +139,7 @@ public class CalendarReconciliation {
             String calendarType) {
         try {
             List<com.google.api.services.calendar.model.Event> remoteEvents =
-                calendarService.listEvents(calendarId, 100);
+                calendarService.listEvents(calendarId, Integer.MAX_VALUE);
 
             // Filter remote events by date range
             remoteEvents = filterByDateRange(remoteEvents, startDate, endDate);
@@ -201,6 +201,7 @@ public class CalendarReconciliation {
             List<com.google.api.services.calendar.model.Event> remoteEvents,
             String calendarId) {
 
+        System.out.println("\nAnalyzing reconciliation for calendar ID: " + calendarId);
         List<ReconciliationAction> actions = new ArrayList<>();
 
         // Build a map of remote events by title+date for quick lookup
@@ -210,7 +211,6 @@ public class CalendarReconciliation {
 
         for (com.google.api.services.calendar.model.Event remoteEvent : remoteEvents) {
             String key = getEventKey(remoteEvent);
-
             if (remoteEventMap.containsKey(key)) {
                 // Duplicate found - track it
                 duplicatesMap.computeIfAbsent(key, k -> new ArrayList<>());

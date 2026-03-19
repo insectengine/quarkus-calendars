@@ -6,6 +6,8 @@ import io.quarkus.logging.Log;
 import jakarta.inject.Inject;
 import picocli.CommandLine;
 
+import java.text.DateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -74,12 +76,18 @@ public class ReconcileCommand implements Callable<Integer> {
                 actions.stream()
                         .map(action -> {
                             String icon = switch (action.getType()) {
-                                case CREATE -> "➕";
-                                case UPDATE -> "✏️";
-                                case DELETE -> "🗑️";
-                                case WARN_ORPHAN -> "⚠️";
+                                case CREATE -> "➕ ";
+                                case UPDATE -> "✏️ ";
+                                case DELETE -> "🗑️ ";
+                                case WARN_ORPHAN -> "⚠️ ";
                             };
-                            return "  " + icon + " " + action.getDescription();
+                            String date = "";
+                            if (action.getLocalEvent() != null) {
+                                date = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(action.getLocalEvent().getDate());
+                            } else if (action.getRemoteEvent() != null) {
+                                date = action.getRemoteEvent().getStart().getDate().toStringRfc3339();
+                            }
+                            return "  " + icon + " " + action.getDescription() + (date.isEmpty() ? "" : " (date: " + date + ")");
                         })
                         .collect(Collectors.joining("\n"))
         );
