@@ -1,0 +1,9 @@
+type: call
+title: Quarkus Insights Episode 245 - HTTP/3 support coming in Vert.x 5.1
+description: |
+    Julien Viet joins us to discuss how Vert.x 5.1 supports HTTP/3 and the QUIC transport protocol to enhance web speed and security resulting in superior performance on modern networks.
+
+date: 2026-04-27
+time: 14:00:00
+duration: PT60M
+callLink: https://quarkus.io/insights/

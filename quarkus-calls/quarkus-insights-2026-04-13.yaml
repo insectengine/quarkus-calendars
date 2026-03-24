@@ -1,0 +1,9 @@
+type: call
+title: Quarkus Insights Episode 243 - What's new with the 3.33 LTS update?
+description: |
+    Guillaume Smet discusses the differences and key improvements when migrating from the Quarkus 3.27 LTS to the new 3.33 LTS update.
+
+date: 2026-04-13
+time: 14:00:00
+duration: PT60M
+callLink: https://quarkus.io/insights/
