@@ -19,7 +19,7 @@ public class Lts {
 
     public boolean isLts(String version) {
         for (String s : getVersions()) {
-            if (version.startsWith(s)) {
+            if (version.startsWith(s.trim())) {
                 return true;
             }
         }

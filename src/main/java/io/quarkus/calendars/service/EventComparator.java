@@ -43,6 +43,11 @@ public class EventComparator {
      * Assumes events match based on title and date.
      */
     public boolean needsUpdate(Event localEvent, com.google.api.services.calendar.model.Event remoteEvent) {
+        // Check title (may differ due to LTS enrichment)
+        if (!equals(localEvent.getTitle(), remoteEvent.getSummary())) {
+            return true;
+        }
+
         // Check description
         String localDescription = localEvent.getDescription();
         String remoteDescription = remoteEvent.getDescription();

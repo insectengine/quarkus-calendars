@@ -52,6 +52,9 @@ public class CalendarReconciliation {
     @Inject
     EventComparator eventComparator;
 
+    @Inject
+    Lts lts;
+
     /**
      * Perform full reconciliation for both calendars using configured date range.
      * Returns the list of actions that were executed.
@@ -204,6 +207,13 @@ public class CalendarReconciliation {
         System.out.println("\nAnalyzing reconciliation for calendar ID: " + calendarId);
         List<ReconciliationAction> actions = new ArrayList<>();
 
+        // Enrich local release event titles with LTS suffix based on config
+        for (T localEvent : localEvents) {
+            if (localEvent instanceof ReleaseEvent) {
+                localEvent.title(enrichTitleWithLts(localEvent));
+            }
+        }
+
         // Build a map of remote events by title+date for quick lookup
         // Also detect duplicates (multiple events with same title+date)
         Map<String, com.google.api.services.calendar.model.Event> remoteEventMap = new HashMap<>();
@@ -346,18 +356,64 @@ public class CalendarReconciliation {
 
     /**
      * Create a unique key for an event based on title and date.
+     * The title is normalized by stripping the (LTS) suffix so that
+     * events match regardless of whether the suffix is present.
      */
     private String getEventKey(Event event) {
-        return event.getTitle() + "|" + event.getDate();
+        return normalizeTitle(event.getTitle()) + "|" + event.getDate();
     }
 
     /**
      * Create a unique key for a Google Calendar event based on title and date.
+     * The title is normalized by stripping the (LTS) suffix so that
+     * events match regardless of whether the suffix is present.
      */
     private String getEventKey(com.google.api.services.calendar.model.Event event) {
-        String title = event.getSummary();
+        String title = normalizeTitle(event.getSummary());
         LocalDate date = EventUtils.extractDate(event);
         return title + "|" + date;
+    }
+
+    /**
+     * Normalize a title by removing the (LTS) suffix for matching purposes.
+     */
+    private String normalizeTitle(String title) {
+        if (title == null) {
+            return null;
+        }
+        return title.replace(" (LTS)", "").trim();
+    }
+
+    /**
+     * Enrich a release event title with the (LTS) suffix if the version is LTS.
+     * For non-release events, returns the title as-is.
+     */
+    private String enrichTitleWithLts(Event event) {
+        String title = event.getTitle();
+        if (!(event instanceof ReleaseEvent) || title == null) {
+            return title;
+        }
+        // Strip existing (LTS) to avoid duplication, then re-add if needed
+        String normalized = normalizeTitle(title);
+        String version = extractVersionFromTitle(normalized);
+        if (version != null && lts.isLts(version)) {
+            return normalized + " (LTS)";
+        }
+        return normalized;
+    }
+
+    /**
+     * Extract the version number from a release title.
+     * E.g., "Quarkus Platform 3.27.3 Release" → "3.27.3"
+     */
+    private String extractVersionFromTitle(String title) {
+        if (title == null) {
+            return null;
+        }
+        java.util.regex.Matcher matcher = java.util.regex.Pattern
+                .compile("\\d+\\.\\d+[\\d.]*(?:\\.CR\\d+)?")
+                .matcher(title);
+        return matcher.find() ? matcher.group() : null;
     }
 
     /**
