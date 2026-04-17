@@ -1,0 +1,9 @@
+type: call
+title: Quarkus Insights Episode 246 - Evolving Minecraft Into a Cloud Native Platform
+description: |
+    Jaden Welderich and Austin Mayes discuss transformed one of the world's largest Minecraft servers from a legacy monolith into a scalable, cloud native game platform on OKD and Quarkus.
+
+date: 2026-05-04
+time: 13:00:00
+duration: PT60M
+callLink: https://quarkus.io/insights/

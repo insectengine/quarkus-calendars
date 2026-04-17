@@ -1,0 +1,9 @@
+type: call
+title: Quarkus Insights Episode 247 - Agentic Orchestration with Quarkus, LangChain4j, and Kubernetes
+description: |
+    Jonathan Johnson details Kubemoot, an open-source multi-agent AI platform where each agent is a Quarkus application compiled to a GraalVM native image, using LangChain4j for tool calling, RAG retrieval, and consensus-based discussions, all orchestrated by a Kubernetes operator. He also explores how Architecture Definition Language (ADL) provides a shared vernacular for agentic prompts.
+
+date: 2026-05-11
+time: 13:00:00
+duration: PT60M
+callLink: https://quarkus.io/insights/
