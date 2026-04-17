@@ -68,7 +68,7 @@ public class ReleaseSyncCommand implements Callable<Integer> {
             Log.info("Processing " + filteredVersions.size() + " versions >= " + MIN_VERSION + "\n");
 
             // Step 4: Load existing YAML files
-            Map<String, LocalDate> existingReleases = loadExistingReleases();
+            Map<String, ExistingRelease> existingReleases = loadExistingReleases();
 
             // Step 5: Process each version
             int created = 0;
@@ -77,20 +77,26 @@ public class ReleaseSyncCommand implements Callable<Integer> {
 
             for (PlatformVersion version : filteredVersions) {
                 String versionStr = version.version();
-                LocalDate existingDate = existingReleases.get(versionStr);
+                ExistingRelease existing = existingReleases.get(versionStr);
+                String expectedTitle = getReleaseTitle(versionStr);
 
-                if (existingDate == null) {
+                if (existing == null) {
                     // Create new YAML file
                     createReleaseYaml(version);
                     created++;
                     Log.info("✓ Created: " + versionStr + " (" + version.date() + ")");
-                } else if (!existingDate.equals(version.date())) {
+                } else if (!existing.date().equals(version.date())) {
                     // Update existing file with new date
-                    updateReleaseYaml(version, existingDate);
+                    updateReleaseYaml(version);
                     updated++;
-                    Log.warn("⚠ Updated: " + versionStr + " (date changed from " + existingDate + " to " + version.date() + ")");
+                    Log.warn("⚠ Updated: " + versionStr + " (date changed from " + existing.date() + " to " + version.date() + ")");
+                } else if (!expectedTitle.equals(existing.title())) {
+                    // Update existing file with corrected title (e.g., missing LTS suffix)
+                    updateReleaseYaml(version);
+                    updated++;
+                    Log.warn("⚠ Updated: " + versionStr + " (title changed from \"" + existing.title() + "\" to \"" + expectedTitle + "\")");
                 } else {
-                    // Already exists with correct date
+                    // Already exists with correct date and title
                     unchanged++;
                 }
             }
@@ -139,8 +145,10 @@ public class ReleaseSyncCommand implements Callable<Integer> {
         return versions;
     }
 
-    private Map<String, LocalDate> loadExistingReleases() {
-        Map<String, LocalDate> releases = new HashMap<>();
+    private record ExistingRelease(LocalDate date, String title) {}
+
+    private Map<String, ExistingRelease> loadExistingReleases() {
+        Map<String, ExistingRelease> releases = new HashMap<>();
         Path dir = Paths.get(RELEASES_DIR);
 
         if (!Files.exists(dir)) {
@@ -165,7 +173,7 @@ public class ReleaseSyncCommand implements Callable<Integer> {
                     ReleaseEvent event = yamlMapper.readValue(yamlFile.toFile(), ReleaseEvent.class);
                     String version = extractVersionFromFilename(yamlFile.getFileName().toString());
                     if (version != null && event.getDate() != null) {
-                        releases.put(version, event.getDate());
+                        releases.put(version, new ExistingRelease(event.getDate(), event.getTitle()));
                     }
                 } catch (IOException e) {
                     Log.warn("Failed to parse existing file " + yamlFile + ": " + e.getMessage());
@@ -206,21 +214,18 @@ public class ReleaseSyncCommand implements Callable<Integer> {
         yamlMapper.writeValue(filePath.toFile(), event);
     }
 
-    private void updateReleaseYaml(PlatformVersion version, LocalDate oldDate) throws IOException {
+    private void updateReleaseYaml(PlatformVersion version) throws IOException {
         Path filePath = getYamlFilePath(version.version());
         ReleaseEvent event = new ReleaseEvent(getReleaseTitle(version.version()), version.date());
         yamlMapper.writeValue(filePath.toFile(), event);
     }
 
     private String getReleaseTitle(String version) {
+        String suffix = lts.isLts(version) ? " (LTS)" : "";
         if (version.toUpperCase().contains("CR")) {
-            return "Quarkus Platform " + version + " Pre-Release";
+            return "Quarkus Platform " + version + " Pre-Release" + suffix;
         } else {
-            if (lts.isLts(version)) {
-                return "Quarkus Platform " + version + " Release (LTS)";
-            } else {
-                return "Quarkus Platform " + version + " Release";
-            }
+            return "Quarkus Platform " + version + " Release" + suffix;
         }
     }
 
